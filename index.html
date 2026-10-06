@@ -1,90 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rayman Golf · Interface</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;user-select:none}
-body{background:#1b2a1f;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:'Segoe UI','Arial',system-ui,sans-serif}
-.game-container{width:880px;max-width:96vw;background:linear-gradient(145deg,#2e4b2c 0%,#1e351e 100%);border-radius:4rem 4rem 3rem 3rem;padding:20px 20px 25px;box-shadow:0 25px 35px rgba(0,0,0,.6),inset 0 2px 8px rgba(255,255,200,.2),inset 0 -8px 10px rgba(0,0,0,.5);border:3px solid #5b8c4e;position:relative}
-.game-container::before{content:"";position:absolute;top:-12px;left:50%;transform:translateX(-50%);width:120px;height:28px;background:radial-gradient(circle,#ffd966 0%,#ffb347 80%,transparent 100%);border-radius:50%;filter:blur(8px);opacity:.7;z-index:5}
-.game-screen{background:#7ec850;background-image:radial-gradient(circle at 20% 30%,#a5e06b 5%,transparent 15%),radial-gradient(circle at 90% 70%,#6aa53a 10%,transparent 30%),repeating-linear-gradient(45deg,#8fd45a 0px,#8fd45a 4px,#7ec850 4px,#7ec850 16px);border-radius:40px 40px 20px 20px;padding:18px 22px 22px;border:4px solid #3e6b2b;box-shadow:inset 0 0 0 3px #a3d67a,inset 0 12px 18px rgba(0,0,0,.25),0 10px 12px rgba(0,0,0,.4);position:relative;min-height:380px;display:flex;flex-direction:column}
-.hud-panel{display:flex;justify-content:space-between;align-items:center;background:rgba(30,20,5,.55);backdrop-filter:blur(3px);border-radius:100px;padding:8px 22px 8px 16px;border:2px solid #f3c26b;box-shadow:0 4px 0 #734f1a,inset 0 2px 8px #ffecb3;margin-bottom:18px}
-.player-badge{display:flex;align-items:center;gap:12px}
-.rayman-avatar{width:48px;height:48px;background:#f7d46b;border-radius:50%;display:flex;justify-content:center;align-items:center;border:3px solid #ffb82e;box-shadow:0 0 0 3px #4e2e0e,0 4px 0 #2d1a06;font-size:32px;line-height:1;transform:rotate(-5deg);position:relative}
-.rayman-avatar::after{content:"👒";position:absolute;font-size:30px;top:-22px;left:-4px;transform:rotate(15deg)}
-.player-info h3{color:#ffefc0;font-size:1.1rem;letter-spacing:1px;text-shadow:2px 2px 0 #3b2a0c,0 0 12px #f9e79f;font-weight:800}
-.player-info .stroke-count{color:#d4ed8c;font-size:1.8rem;font-weight:900;line-height:1;text-shadow:3px 3px 0 #1e3a0e,0 0 10px #b5ff6b;display:flex;align-items:baseline;gap:6px}
-.stroke-count span{font-size:1rem;color:#ffe484}
-.hole-info{background:#31200b;border-radius:40px;padding:6px 22px;border:2px solid #d9a13b;box-shadow:inset 0 2px 8px #a77b2e,0 4px 0 #1a1004;text-align:center}
-.hole-info .hole-number{font-size:1.9rem;font-weight:900;color:#ffeeb5;text-shadow:2px 2px 0 #764e1a,0 0 12px #ffd966;line-height:1.2}
-.hole-info .par{font-size:.8rem;color:#fdd77d;letter-spacing:2px;font-weight:700;background:#533d1a;padding:0 12px;border-radius:20px}
-.field{flex:1;background:#63a63b;background-image:radial-gradient(circle at 30% 40%,#b1e07c 8%,transparent 25%),radial-gradient(circle at 80% 75%,#3d7a1e 12%,transparent 35%),linear-gradient(135deg,#63a63b 0%,#529132 100%);border-radius:80px 80px 40px 40px;box-shadow:inset 0 0 0 4px #3c6b1e,inset 0 12px 25px rgba(0,0,0,.4);position:relative;margin-bottom:8px;display:flex;align-items:center;justify-content:center;min-height:200px}
-.hole-cup{position:absolute;left:76%;top:48%;width:34px;height:18px;background:#2b1b0a;border-radius:50%;box-shadow:inset 0 6px 0 #0b0702,0 8px 8px rgba(0,0,0,.5);border:2px solid #5c471f;z-index:2}
-.hole-cup::after{content:"";position:absolute;top:2px;left:4px;width:22px;height:6px;background:#060300;border-radius:50%;opacity:.6}
-.golf-ball{position:absolute;left:25%;top:60%;width:28px;height:28px;background:#fff;background:radial-gradient(circle at 35% 35%,#fff9e6,#d0d0d0);border-radius:50%;box-shadow:0 0 0 3px #a0a0a0,0 10px 10px rgba(0,0,0,.3),inset -3px -3px 8px rgba(0,0,0,.2);z-index:3;transition:all .2s}
-.golf-ball::after{content:"";position:absolute;width:8px;height:8px;background:#eee;border-radius:50%;top:6px;left:6px;box-shadow:-1px -1px 3px #fff}
-.golf-club{position:absolute;left:8%;top:48%;width:70px;height:70px;transform:rotate(-35deg);filter:drop-shadow(3px 8px 6px rgba(0,0,0,.5));z-index:4}
-.club-shaft{position:absolute;bottom:12px;left:32px;width:5px;height:60px;background:linear-gradient(90deg,#c0c0c0,#f0f0f0,#a0a0a0);border-radius:4px;box-shadow:inset -1px 0 0 #808080,0 0 0 1px #444;transform:rotate(12deg);transform-origin:bottom center}
-.club-head{position:absolute;bottom:0;left:10px;width:40px;height:22px;background:linear-gradient(145deg,#b0b0b0,#505050);border-radius:6px 6px 12px 12px;box-shadow:inset -2px -2px 0 #303030,inset 2px 2px 0 #d0d0d0,0 2px 0 #1a1a1a,0 6px 8px rgba(0,0,0,.4);transform:skewX(-8deg);border:1px solid #202020}
-.club-head::after{content:"";position:absolute;bottom:2px;left:6px;width:26px;height:4px;background:#e0e0e0;border-radius:4px;opacity:.3}
-.grip{position:absolute;bottom:65px;left:36px;width:7px;height:16px;background:#c0392b;border-radius:4px;box-shadow:inset -1px -1px 0 #7b241c,0 0 0 1px #2e0f0c;transform:rotate(12deg);transform-origin:bottom center;z-index:2}
-.grip::after{content:"";position:absolute;top:2px;left:1px;width:2px;height:12px;background:#e74c3c;border-radius:2px;opacity:.6}
-.sparkle{position:absolute;left:6%;top:20%;font-size:22px;filter:drop-shadow(0 0 8px gold);opacity:.7;transform:rotate(10deg);pointer-events:none}
-.controls{display:flex;justify-content:space-between;align-items:center;background:linear-gradient(145deg,#4d4a30,#2b2818);border-radius:60px;padding:12px 26px;margin-top:12px;border:3px solid #b68f4b;box-shadow:0 10px 0 #1e1a0c,inset 0 2px 12px #e3c87c,inset 0 -5px 8px #0f0d05}
-.btn-group{display:flex;gap:16px;align-items:center}
-.btn{background:linear-gradient(145deg,#f7dfa0,#b8823a);border:none;border-radius:100px;padding:12px 24px;font-weight:900;font-size:1.2rem;color:#281e0b;text-shadow:1px 1px 0 #ffe9b0;box-shadow:0 6px 0 #6d4f1e,0 8px 12px rgba(0,0,0,.4);cursor:pointer;letter-spacing:1px;display:flex;align-items:center;gap:8px;transition:all .06s ease;border:2px solid #fce7b0}
-.btn:active{transform:translateY(6px);box-shadow:0 2px 0 #6d4f1e,0 5px 10px rgba(0,0,0,.4)}
-.btn.aim{background:linear-gradient(145deg,#aad6ff,#4f7eb3);color:#0b1a2e;text-shadow:1px 1px 0 #c2e2ff;border-color:#c2e2ff;box-shadow:0 6px 0 #2a4a6e,0 8px 12px rgba(0,0,0,.5)}
-.btn.swing{background:linear-gradient(145deg,#f9a26c,#c95f1a);color:#2d1602;text-shadow:1px 1px 0 #ffc9a3;border-color:#ffc9a3;box-shadow:0 6px 0 #873f0e,0 8px 12px rgba(0,0,0,.5);font-size:1.4rem;padding:12px 38px}
-.power-meter{display:flex;align-items:center;gap:12px;background:#1c1a0e;padding:6px 20px 6px 14px;border-radius:40px;border:2px solid #b69b4b;box-shadow:inset 0 2px 10px #060500}
-.power-label{color:#f7e6b0;font-weight:700;letter-spacing:1px;font-size:.85rem;text-transform:uppercase}
-.meter-bar{width:120px;height:22px;background:#352d14;border-radius:30px;overflow:hidden;border:2px solid #dbb65a;box-shadow:inset 0 2px 8px #000;display:flex}
-.meter-fill{width:78%;height:100%;background:linear-gradient(90deg,#f9d56e,#f09b3c,#e05a1e);border-radius:30px;box-shadow:0 0 12px #ffb86b;transition:width .1s}
-@media (max-width:700px){.game-container{padding:12px}.controls{flex-wrap:wrap;gap:10px;justify-content:center}.btn{padding:8px 16px;font-size:1rem}.btn.swing{padding:8px 22px}.meter-bar{width:80px}.golf-club{left:4%;top:44%}.hole-cup{left:72%;top:46%}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rayman Golf · Interface</title>
+  <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-<div class="game-container">
-<div class="game-screen">
-<div class="hud-panel">
-<div class="player-badge">
-<div class="rayman-avatar">🧑‍🦱</div>
-<div class="player-info">
-<h3>RAYMAN</h3>
-<div class="stroke-count">2 <span>strokes</span></div>
-</div>
-</div>
-<div class="hole-info">
-<div class="hole-number">3</div>
-<div class="par">PAR 4</div>
-</div>
-</div>
-<div class="field">
-<div class="hole-cup"></div>
-<div class="golf-club">
-<div class="club-shaft"></div>
-<div class="grip"></div>
-<div class="club-head"></div>
-</div>
-<div class="golf-ball"></div>
-<div class="sparkle">✨</div>
-</div>
-<div class="controls">
-<div class="btn-group">
-<button class="btn aim" aria-label="Aim">🎯 AIM</button>
-<button class="btn swing" aria-label="Swing">⛳ SWING</button>
-</div>
-<div class="power-meter">
-<span class="power-label">PWR</span>
-<div class="meter-bar">
-<div class="meter-fill" style="width:78%"></div>
-</div>
-</div>
-</div>
-</div>
-<div style="position:absolute;top:12px;left:30px;font-size:28px;opacity:.6;filter:drop-shadow(0 0 8px gold)">✨</div>
-</div>
+  <div class="game-container">
+    <div class="game-screen">
+      <div class="hud-panel">
+        <div class="player-badge">
+          <div class="rayman-avatar">🧑‍🦱</div>
+          <div class="player-info">
+            <h3>RAYMAN</h3>
+            <div class="stroke-count">
+              <span id="strokes">2</span> <span>strokes</span>
+            </div>
+          </div>
+        </div>
+        <div class="hole-info">
+          <div class="hole-number" id="hole-number">3</div>
+          <div class="par">PAR 4</div>
+        </div>
+      </div>
+
+      <div class="field" id="field">
+        <div class="hole-cup" id="hole-cup"></div>
+
+        <div class="golf-club" id="golf-club">
+          <div class="club-shaft"></div>
+          <div class="grip"></div>
+          <div class="club-head"></div>
+        </div>
+
+        <div class="golf-ball" id="golf-ball"></div>
+        <div class="sparkle">✨</div>
+      </div>
+
+      <div class="controls">
+        <div class="btn-group">
+          <button class="btn aim" id="btn-aim">🎯 AIM</button>
+          <button class="btn swing" id="btn-swing">⛳ SWING</button>
+        </div>
+        <div class="power-meter">
+          <span class="power-label">PWR</span>
+          <div class="meter-bar">
+            <div class="meter-fill" id="meter-fill" style="width:78%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/audio.js"></script>
+  <script src="assets/js/game.js"></script>
+  <script src="assets/js/main.js"></script>
 </body>
 </html>
