@@ -249,3 +249,10 @@ body {
   .golf-club{left:4%;top:44%}
   .hole-cup{left:72%;top:46%}
 }
+
+/* --- physics / hole-in feedback --- */
+.golf-ball.in-hole {
+  transform: scale(0.35);
+  opacity: 0.2;
+  transition: transform .25s ease, opacity .25s ease;
+}
