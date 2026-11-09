@@ -1,0 +1,57 @@
+---
+---
+
+<div id="game-root" class="game-root">
+  <div id="game-loading" class="loading">
+    <span>Loading course…</span>
+  </div>
+</div>
+
+<style>
+  .game-root {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #8fd45a;
+    overflow: hidden;
+    touch-action: none;
+  }
+
+  .game-root canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: monospace;
+    font-size: 18px;
+    color: #1a1a1a;
+    background: #8fd45a;
+    z-index: 10;
+    transition: opacity 0.4s ease;
+  }
+
+  .loading.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+</style>
+
+<script>
+  import { mountGame } from '../game/core/Game'
+
+  window.addEventListener('load', () => {
+    mountGame('game-root')
+    const loading = document.getElementById('game-loading')
+    if (loading) {
+      setTimeout(() => loading.classList.add('hidden'), 300)
+    }
+  })
+</script>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rayman Golf · Interface</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <div class="game-container">
+    <div class="game-screen">
+      <div class="hud-panel">
+        <div class="player-badge">
+          <div class="rayman-avatar">🧑‍🦱</div>
+          <div class="player-info">
+            <h3>RAYMAN</h3>
+            <div class="stroke-count">
+              <span id="strokes">0</span> <span>strokes</span>
+            </div>
+          </div>
+        </div>
+        <div class="hole-info">
+          <div class="hole-number" id="hole-number">1</div>
+          <div class="par">PAR 4</div>
+        </div>
+      </div>
+
+      <div class="field" id="field">
+        <svg class="aim-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <line id="aim-line" x1="25" y1="60" x2="40" y2="60" />
+        </svg>
+        <div class="hole-cup" id="hole-cup"></div>
+
+        <div class="golf-club" id="golf-club">
+          <div class="club-shaft"></div>
+          <div class="grip"></div>
+          <div class="club-head"></div>
+        </div>
+
+        <div class="golf-ball" id="golf-ball"></div>
+        <div class="sparkle">✨</div>
+      </div>
+
+      <div class="controls">
+        <div class="btn-group">
+          <button class="btn aim" id="btn-aim">🎯 AIM</button>
+          <button class="btn swing" id="btn-swing">⛳ SWING</button>
+        </div>
+        <div class="power-meter">
+          <span class="power-label">PWR</span>
+          <div class="meter-bar">
+            <div class="meter-fill" id="meter-fill" style="width:78%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/audio.js"></script>
+  <script src="assets/js/game.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

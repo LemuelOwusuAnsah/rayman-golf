@@ -5,15 +5,19 @@ const Game = (() => {
     hole: 1,
     par: 4,
     power: 0.5,
+    aim: 0,
     ball: { x: 25, y: 60, vx: 0, vy: 0, rolling: false, inHole: false },
     holePos: { x: 76, y: 48 },
     holeRadius: 2.2,
   };
 
-  const FRICTION     = 3.2;
-  const MIN_SPEED    = 0.6;
-  const MAX_SPEED    = 55;
-  const GRAVITY_PULL = 6;
+  const FRICTION     = 2.1;
+  const MIN_SPEED    = 0.4;
+  const MAX_SPEED    = 110;
+  const WALL_BOUNCE  = 0.6;
+  const AIM_STEP     = 0.05;
+  const AIM_MIN      = -Math.PI * 0.95;
+  const AIM_MAX      =  Math.PI * 0.95;
 
   const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 
@@ -23,17 +27,19 @@ const Game = (() => {
     if (fill) fill.style.width = (state.power * 100) + '%';
   }
 
+  function adjustAim(delta) {
+    state.aim = Math.max(AIM_MIN, Math.min(AIM_MAX, state.aim + delta));
+  }
+
+  function aimToHole() {
+    const b = state.ball, h = state.holePos;
+    state.aim = Math.atan2(h.y - b.y, h.x - b.x);
+  }
+
   function incrementStroke() {
     state.strokes++;
     const el = document.getElementById('strokes');
     if (el) el.textContent = state.strokes;
-  }
-
-  function aimVector() {
-    const b = state.ball, h = state.holePos;
-    const dx = h.x - b.x, dy = h.y - b.y;
-    const len = Math.hypot(dx, dy) || 1;
-    return { x: dx / len, y: dy / len };
   }
 
   function swing() {
@@ -41,19 +47,16 @@ const Game = (() => {
     if (b.rolling || b.inHole) return false;
     incrementStroke();
     const speed = MIN_SPEED + Math.pow(state.power, 1.35) * MAX_SPEED;
-    const dir = aimVector();
-    b.vx = dir.x * speed;
-    b.vy = dir.y * speed;
+    b.vx = Math.cos(state.aim) * speed;
+    b.vy = Math.sin(state.aim) * speed;
     b.rolling = true;
-    const drift = (Math.random() - 0.5) * speed * 0.12;
-    b.vx += -dir.y * drift;
-    b.vy +=  dir.x * drift;
     return true;
   }
 
   function update(dt) {
     const b = state.ball;
     if (!b.rolling) return;
+
     b.x += b.vx * dt;
     b.y += b.vy * dt;
 
@@ -61,36 +64,35 @@ const Game = (() => {
     b.vx *= decay;
     b.vy *= decay;
 
-    const speed = Math.hypot(b.vx, b.vy);
-    if (speed > 0.01) {
-      const nx = -b.vy / speed, ny = b.vx / speed;
-      b.vx += nx * GRAVITY_PULL * dt;
-      b.vy += ny * GRAVITY_PULL * dt;
-    }
-
-    if (b.x < 2)  { b.x = 2;  b.vx = Math.abs(b.vx) * 0.6; }
-    if (b.x > 98) { b.x = 98; b.vx = -Math.abs(b.vx) * 0.6; }
-    if (b.y < 2)  { b.y = 2;  b.vy = Math.abs(b.vy) * 0.6; }
-    if (b.y > 98) { b.y = 98; b.vy = -Math.abs(b.vy) * 0.6; }
+    if (b.x < 2)  { b.x = 2;  b.vx = Math.abs(b.vx) * WALL_BOUNCE; }
+    if (b.x > 98) { b.x = 98; b.vx = -Math.abs(b.vx) * WALL_BOUNCE; }
+    if (b.y < 2)  { b.y = 2;  b.vy = Math.abs(b.vy) * WALL_BOUNCE; }
+    if (b.y > 98) { b.y = 98; b.vy = -Math.abs(b.vy) * WALL_BOUNCE; }
 
     if (!b.inHole && dist(b, state.holePos) < state.holeRadius) {
       const s = Math.hypot(b.vx, b.vy);
       if (s < 12) {
         b.inHole = true;
         b.rolling = false;
-        b.vx = 0; b.vy = 0;
+        b.vx = 0;
+        b.vy = 0;
         b.x = state.holePos.x;
         b.y = state.holePos.y;
         if (window.AudioEngine) {
-          ['C5','E5','G5','C6'].forEach((n, i) =>
-            setTimeout(() => AudioEngine.playNamedNote(n, 0.35, 'triangle'), i * 110));
+          ['C5', 'E5', 'G5', 'C6'].forEach((n, i) =>
+            setTimeout(() => AudioEngine.playNamedNote(n, 0.35, 'triangle'), i * 110)
+          );
         }
-        document.dispatchEvent(new CustomEvent('hole-in', { detail: { strokes: state.strokes, par: state.par } }));
+        document.dispatchEvent(
+          new CustomEvent('hole-in', { detail: { strokes: state.strokes, par: state.par } })
+        );
       }
     }
 
     if (Math.hypot(b.vx, b.vy) < MIN_SPEED) {
-      b.vx = 0; b.vy = 0; b.rolling = false;
+      b.vx = 0;
+      b.vy = 0;
+      b.rolling = false;
       if (!b.inHole && window.AudioEngine) AudioEngine.playNamedNote('A3', 0.12, 'sine');
     }
   }
@@ -99,10 +101,12 @@ const Game = (() => {
     return {
       ball: { ...state.ball },
       power: state.power,
+      aim: state.aim,
       strokes: state.strokes,
       hole: state.hole,
       par: state.par,
       inHole: state.ball.inHole,
+      holePos: { ...state.holePos },
     };
   }
 
@@ -113,6 +117,7 @@ const Game = (() => {
     state.ball.vy = 0;
     state.ball.rolling = false;
     state.ball.inHole = false;
+    aimToHole();
   }
 
   function nextHole() {
@@ -131,9 +136,17 @@ const Game = (() => {
     document.dispatchEvent(new CustomEvent('next-hole', { detail: { hole: state.hole } }));
   }
 
+  aimToHole();
+
   return {
-    setPower, incrementStroke, swing, update,
-    getRenderState, resetBall, nextHole,
+    setPower,
+    adjustAim,
+    incrementStroke,
+    swing,
+    update,
+    getRenderState,
+    resetBall,
+    nextHole,
     getState: () => state,
   };
 })();
